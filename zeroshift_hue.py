@@ -11,9 +11,7 @@ class Hue(object):
           self.bridge_ip = self.getBridgeIP() 
         
         self.devicetype = devicetype
-
         self.username = username
-        #self.username = "29b66ed65c38720d0ab3a21749c9b"
 
         # Colors
         self.red    = 0 
