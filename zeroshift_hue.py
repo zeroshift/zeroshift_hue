@@ -3,6 +3,7 @@
 import json
 import requests
 import sys, time
+from threading import *
 
 class Hue(object):
     def __init__(self, devicetype="zeroshift-hue", username=None, bridge_ip=None):
@@ -12,14 +13,6 @@ class Hue(object):
         
         self.devicetype = devicetype
         self.username = username
-
-        # Colors
-        self.red    = 0 
-        self.blue   = 46920
-        self.green  = 25500
-        self.yellow = 12750
-        self.purple = 56100
-        self.crelax  = 13068
 
     def getBridgeIP(self): 
         try:
@@ -35,74 +28,33 @@ class Hue(object):
         if self.username:
             return self.username
         else:
-            response = self.createUser(self.devicetype)
-            # Note: Fix this. It's ugly
-            try:
-                if response[0]['error']:
-                    print "Warning: %" % response[0]['error']['description']
-                    return False
-            except:
-                pass
-            try:
-                if response[0]['success']:
-                    self.username = response[0]['success']['username']
-                    return self.username
-            except:
-                return False
+            while True:
+                response = self.createUser(self.devicetype)
+                # Note: Fix this. It's ugly
+                try:
+                    if response[0]['error']:
+                        print "Warning: %" % response[0]['error']['description']
+                except:
+                    pass
+                try:
+                    if response[0]['success']:
+                        self.username = response[0]['success']['username']
+                        break
+                except:
+                    pass
+            return self.username
 
     # Custom
-    def off(self):
-        for light in self.getAllLights():
-            self.setLightState(light, on=False)
-    
-    def relax(self):
-        for light in self.getAllLights():
-            self.setLightState(light, on=True, hue=self.crelax, sat=200, bri=170)
+    def getLightObject(self, light_id):
+        light = Light(self, light_id)
+        return light
 
-    def alert(self, light_id, alert_long=False):
-        alert_type = "select"
-        if alert_long:
-            alert_type = "lselect"
-
-        if light_id == "all":
-            for light in self.getAllLights():
-                self.setLightState(light, alert=alert_type)
-        else:
-            self.setLightState(light_id, alert=alert_type)
-    
-    def blinkPurple(self):
-        self.blink(self.purple)
-    
-    def blinkYellow(self):
-        self.blink(self.yellow)
-    
-    def blinkGreen(self):
-        self.blink(self.green)
-    
-    def blinkBlue(self):
-        self.blink(self.blue)
-    
-    def blinkRed(self):
-        self.blink(self.red)
-
-    def blink(self, color):
-        states = {}
-        lights = self.getAllLights()
-        for light in lights:
-            states[light] = self.getLightAttribsAndState(light)['state']
-            
-        for light in lights:
-            response = self.setLightState(light, on=True, hue=color, bri=255, sat=255, transiontime=10)
-        
-        time.sleep(1)
-
-        for light in lights:
-            response = self.setLightState(light, on=True, alert="select")
-
-        time.sleep(1)
-
-        for light in lights:
-            self.setLightStateWithPayload(light, states[light])
+    def getAllLightObjects(self):
+        lights = []
+        for light_id in self.getAllLights():
+            light = Light(self, light_id)
+            lights.append(light)
+        return lights
 
     def getLightState(self, light_id):
         r = requests.get(("http://%s/api/%s/lights/%s" % (self.bridge_ip, self.username, light_id)))
@@ -235,3 +187,53 @@ class Hue(object):
     def discoverLocalBridges(self):
         r = requests.get("http://www.meethue.com/api/nupnp")
         return json.loads(r.text)
+
+class Light(object):
+    def __init__(self, hue, light_id):
+        self.hue = hue
+        self.light_id = light_id
+
+        # Colors
+        self.red    = 0 
+        self.blue   = 46920
+        self.green  = 25500
+        self.yellow = 12750
+        self.purple = 56100
+        self.crelax  = 13068
+
+
+    
+    def on(self):
+        self.hue.setLightState(self.light_id, on=True)
+
+    def off(self):
+        self.hue.setLightState(self.light_id, on=False)
+    
+    def relax(self):
+        self.hue.setLightState(self.light_id, on=True, hue=self.crelax, sat=200, bri=170)
+
+    def alert(self, alert_type="select"):
+        self.setLightState(self.light_id, alert=alert_type)
+    
+    def blinkPurple(self):
+        self.blink(self.purple)
+    
+    def blinkYellow(self):
+        self.blink(self.yellow)
+    
+    def blinkGreen(self):
+        self.blink(self.green)
+    
+    def blinkBlue(self):
+        self.blink(self.blue)
+    
+    def blinkRed(self):
+        self.blink(self.red)
+
+    def blink(self, color):
+        state = self.hue.getLightAttribsAndState(self.light_id)['state']
+        response = self.hue.setLightState(self.light_id, on=True, hue=color, bri=255, sat=255, transiontime=10)
+        time.sleep(1)
+        response = self.hue.setLightState(self.light_id, on=True, alert="select")
+        time.sleep(1)
+        self.hue.setLightStateWithPayload(self.light_id, state)
