@@ -106,6 +106,14 @@ class Hue(object):
         for light in lights:
             self.setLightStateWithPayload(light, states[light])
 
+    def getLightState(self, light_id):
+        r = requests.get(("http://%s/api/%s/lights/%s" % (self.bridge_ip, self.username, light_id)))
+        return json.loads(r.text)['state']
+
+    def setLightStateWithPayload(self, light_id, payload):
+        r = requests.put(("http://%s/api/%s/lights/%s/state" % (self.bridge_ip, self.username, light_id)), json.dumps(payload))
+        return json.loads(r.text)
+
     # Lights
     def getAllLights(self):
         r = requests.get(("http://%s/api/%s/lights" % (self.bridge_ip, self.username)))
@@ -136,10 +144,6 @@ class Hue(object):
         r = requests.put(("http://%s/api/%s/lights/%s/state" % (self.bridge_ip, self.username, light_id)), json.dumps(payload))
         return json.loads(r.text)   
     
-    def setLightStateWithPayload(self, light_id, payload):
-        r = requests.put(("http://%s/api/%s/lights/%s/state" % (self.bridge_ip, self.username, light_id)), json.dumps(payload))
-        return json.loads(r.text)   
-
     ## Groups
     def getAllGroups(self):
         r = requests.get(("http://%s/api/%s/groups" % (self.bridge_ip, self.username)))
