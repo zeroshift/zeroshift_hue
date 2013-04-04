@@ -14,3 +14,4 @@ setup(name='zeroshift_hue',
       py_modules=['zeroshift_hue'],
       scripts=['zeroshift_hue.py'],
       license='BSD'
+)
