@@ -5,12 +5,14 @@ My hue module for Python. Trying to match the official API.
 
 Example:
 
-from zeroshift_hue import Hue
+.. code-block:: python
 
-h = Hue(devicetype="zeroshift_hue") #username="username" if you already have one
-username = h.authenticate() #Save the username if you're generating one now
+    from zeroshift_hue import Hue
 
-lights = getAllLightObjects()
+    h = Hue(devicetype="zeroshift_hue") #username="username" if you already have one
+    username = h.authenticate() #Save the username if you're generating one now
 
-for light in lights:
-    light.blinkRed()
+    lights = getAllLightObjects()
+
+    for light in lights:
+        light.blinkRed()
