@@ -4,6 +4,7 @@ zeroshift_hue
 My hue module for Python. Trying to match the official API.
 
 Example:
+-------
 
 .. code-block:: python
 
@@ -16,3 +17,4 @@ Example:
 
     for light in lights:
         light.blinkRed()
+
