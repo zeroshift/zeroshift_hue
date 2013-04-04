@@ -42,6 +42,7 @@ class Hue(object):
                         break
                 except:
                     pass
+                time.sleep(5)
             return self.username
 
     # Custom
@@ -200,8 +201,6 @@ class Light(object):
         self.yellow = 12750
         self.purple = 56100
         self.crelax  = 13068
-
-
     
     def on(self):
         self.hue.setLightState(self.light_id, on=True)
@@ -232,7 +231,8 @@ class Light(object):
 
     def blink(self, color):
         state = self.hue.getLightAttribsAndState(self.light_id)['state']
-        response = self.hue.setLightState(self.light_id, on=True, hue=color, bri=255, sat=255, transiontime=10)
+        response = self.hue.setLightState(self.light_id, on=True, \
+            hue=color, bri=255, sat=255, transiontime=10)
         time.sleep(1)
         response = self.hue.setLightState(self.light_id, on=True, alert="select")
         time.sleep(1)
