@@ -19,16 +19,18 @@ class Hue(object):
             response = self.discoverLocalBridges()
             bridge_ip = response[0]['internalipaddress']
             print "Discovered bridge. IP: %s" % bridge_ip
-            return True
+            return bridge_ip
         except:
             print "Could not get bridge IP!"
             return False
 
     def authenticate(self):
+        did_get_username = False
         if self.username:
-            return self.username
+            return True
         else:
-            while True:
+            count = 0
+            while count < 6:
                 response = self.createUser(self.devicetype)
                 # Note: Fix this. It's ugly
                 try:
@@ -39,11 +41,13 @@ class Hue(object):
                 try:
                     if response[0]['success']:
                         self.username = response[0]['success']['username']
+                        did_get_username = True
                         break
                 except:
                     pass
+                count += 1
                 time.sleep(5)
-            return self.username
+            return did_get_username
 
     # Custom
     def getLightObject(self, light_id):
