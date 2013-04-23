@@ -19,7 +19,7 @@ class Hue(object):
             response = self.discoverLocalBridges()
             bridge_ip = response[0]['internalipaddress']
             print "Discovered bridge. IP: %s" % bridge_ip
-            return bridge_ip
+            return True
         except:
             print "Could not get bridge IP!"
             return False
