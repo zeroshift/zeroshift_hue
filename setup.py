@@ -4,7 +4,7 @@ from distutils.core import setup
 #from setuptools import setup, find_packages
 
 setup(name='zeroshift_hue',
-    version="0.1",
+    version="0.1.1",
     description='Module for Philips Hue bulbs.',
     long_description="Module for Philips Hue bulbs.",
     author="Nick Prendergast",
