@@ -24,7 +24,7 @@ class Hue(object):
             while count < 6:
                 response = self._createUser(self.devicetype)
                 if response[0].has_key('error'):
-                    logging.warning("Warning: %" % response[0]['error']['description'])
+                    logging.warning("Warning: {0}".format(response[0]['error']['description']))
                 elif response[0].has_key('success'):
                     self.username = response[0]['success']['username']
                     did_get_username = True
@@ -39,7 +39,7 @@ class Hue(object):
         try:
             response = self._discoverLocalBridges()
             bridge_ip = response[0]['internalipaddress']
-            logging.debug("Discovered bridge. IP: %s" % bridge_ip)
+            logging.debug("Discovered bridge. IP: {0}".format(bridge_ip))
             return bridge_ip
         except:
             logging.debug("Could not get bridge IP!")
